@@ -9,13 +9,15 @@
 </head>
 
 <body>
-    <form action="/stats" enctype="multipart/form-data" method="post">
+    <form action="/stats" enctype="multipart/form-data" method="post" id="form1">
         <div class="form-group">
-            <input type="file" class="form-control-file" name="uploaded_file">
+            <input type="file" class="form-control-file" name="uploaded_file" id="fileUpload">
             <input type="text" class="form-control" placeholder="Number of speakers" name="nspeakers">
             <input type="submit" value="Get me the stats!" class="btn btn-default">
         </div>
     </form>
+
+    <button onclick="uploadImage()">Upload</button>
 
     <button onclick="jF1()">Show Image</button>
 
@@ -29,9 +31,41 @@
             const imageObjectURL = URL.createObjectURL(imageBlob);
 
             const image = document.getElementById('Img1')
-            image.src = imageObjectURL
+            image.src = imageObjectURL;
 
         };
+
+        let uploadImage = () => {
+            // This assumes the form's name is `myForm`
+            var form = document.getElementById("form1");
+            var formData = new FormData(form);
+            fetch('/stats', {
+                method: 'POST',
+                body: formData
+            });
+        };
+
+        const handleImageUpload = event => {
+            const files = event.target.files
+            const formData = new FormData();
+            formData.append('uploaded_file', files[0])
+
+            fetch('/stats', {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data.path)
+                })
+                .catch(error => {
+                    console.error(error)
+                })
+        };
+
+        document.querySelector('#fileUpload').addEventListener('change', event => {
+            handleImageUpload(event)
+        });
     </script>
 </body>
 

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <video autoplay="true" id="video">
+    </video>
+
+    <canvas id="canvas"></canvas>
+
+    <button id="snap">Click</button>
+
+
+    <script>
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const snap = document.getElementById('snap'); //Button
+        const constraints = {
+            audio: false,
+            video: {
+                width: {
+                    // min: 1024,
+                    ideal: canvas.width,
+                    // max: 1920,
+                },
+                height: {
+                    // min: 576,
+                    ideal: canvas.height,
+                    // max: 1080,
+                },
+            }
+        }
+
+        async function startWebCam() {
+            try {
+                //getUserMedia() returns Promise
+                const stream = await navigator.mediaDevices.getUserMedia(constraints);
+                video.srcObject = stream;
+                window.stream = stream;
+            }
+            catch (e) {
+                console.log(e.toString());
+            }
+        }
+
+        var context = canvas.getContext('2d');
+
+        snap.addEventListener('click', () => {
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+        });
+
+        startWebCam();
+
+        const handleImageUpload = event => {
+            const files = event.target.files
+            const formData = new FormData();
+            formData.append('uploaded_file', files[0])
+
+            fetch('/stats', {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data.path)
+                })
+                .catch(error => {
+                    console.error(error)
+                })
+        };
+    </script>
+</body>
+
+</html>
