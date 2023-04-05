@@ -6,6 +6,7 @@ const http = require('http');
 const app = express();
 var path = require('path');
 const server = http.createServer(app);
+let fs = require("fs");
 
 var port = normalizePort(process.env.PORT || '4116');
 
@@ -31,14 +32,42 @@ let kmiddle = (req, res, next) => {
     req.KeshavSoft = "Keshav";
     next();
 };
+const convert = (imgPath) => {
+    // read image file
+    fs.readFile(imgPath, (err, data) => {
+        // error handle
+        if (err) {
+            throw err;
+        }
+
+        // get image file extension name
+        const extensionName = path.extname(imgPath);
+
+        // convert image file to base64-encoded string
+        const base64Image = Buffer.from(data, 'binary').toString('base64');
+
+        // combine all strings
+        const base64ImageStr = `data:image/${extensionName.split('.').pop()};base64,${base64Image}`;
+
+        console.log("base64ImageStr : ", base64ImageStr);
+    })
+}
 
 app.get('/', function (req, res, next) {
     res.sendFile(path.join(__dirname + `/upload.html`));
 });
-
-
 app.get('/file', function (req, res, next) {
+    res.sendFile(path.join(__dirname + `/uploads/54ba0a63f9dc9b0640d28c126cc36ba6`));
+});
+
+app.get('/file1', function (req, res, next) {
     res.sendFile(path.join(__dirname + `/Images/1680285347210.jpg`));
+});
+
+app.get('/file2', async (req, res, next) => {
+    console.log("aaaaaaaaaaa");
+    convert(`Images/1680285347210.jpg`);
+    //res.sendFile(fs.readFileSync(`Images/1680285347210.jpg`, { encoding: 'base64' }));
 });
 
 app.post('/stats', kmiddle, upload.single("uploaded_file"), function (req, res) {

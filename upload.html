@@ -25,7 +25,7 @@
 
     <script>
         let jF1 = async () => {
-            let response = await fetch(`/file`);
+            let response = await fetch(`/file2`);
             const imageBlob = await response.blob();
 
             const imageObjectURL = URL.createObjectURL(imageBlob);
